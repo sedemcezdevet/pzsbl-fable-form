@@ -8,6 +8,7 @@
         </Description>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="SelectSearch.fs" />
         <Compile Include="Form.fsi" />
         <Compile Include="Form.fs" />
     </ItemGroup>

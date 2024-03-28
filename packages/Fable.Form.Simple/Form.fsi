@@ -9,6 +9,7 @@ module Form =
     type RadioField<'Values> = Field.RadioField.RadioField<'Values>
     type CheckboxField<'Values> = Field.CheckboxField.CheckboxField<'Values>
     type SelectField<'Values> = Field.SelectField.SelectField<'Values>
+    type SelectSearchField<'Values> = Field.SelectSearchField.SelectSearchField<'Values>
     type FileField<'Values> = Field.FileField.FileField<'Values>
 
     /// <summary>
@@ -45,6 +46,7 @@ module Form =
         | Radio of RadioField<'Values>
         | Checkbox of CheckboxField<'Values>
         | Select of SelectField<'Values>
+        | SelectSearch of SelectSearchField<'Values>
         | File of FileField<'Values>
         | Group of FilledField<'Values, 'Attributes> list
         | Section of title: string * FilledField<'Values, 'Attributes> list
@@ -413,6 +415,10 @@ module Form =
         config : Base.FieldConfig<Field.SelectField.Attributes,string,'Values, 'Output> ->
         Form<'Values,'Output, 'Attributes>
 
+    val selectSearchField :
+        config : Base.FieldConfig<Field.SelectSearchField.Attributes,obj,'Values, 'Output> ->
+        Form<'Values,'Output, 'Attributes>
+
     /// <summary>
     /// Create a form that contains a file field
     /// </summary>
@@ -692,6 +698,19 @@ module Form =
             }
 
         [<NoComparison; NoEquality>]
+        type SelectSearchFieldConfig<'Msg> =
+            {
+                Dispatch: Elmish.Dispatch<'Msg>
+                OnChange: obj -> 'Msg
+                OnBlur: 'Msg option
+                Disabled: bool
+                Value: obj
+                Error: Error.Error option
+                ShowError: bool
+                Attributes: Field.SelectSearchField.Attributes
+            }
+
+        [<NoComparison; NoEquality>]
         type FileFieldConfig<'Msg> =
             {
                 Dispatch: Elmish.Dispatch<'Msg>
@@ -744,6 +763,7 @@ module Form =
                 CheckboxField : CheckboxFieldConfig<'Msg> -> ReactElement
                 RadioField : RadioFieldConfig<'Msg> -> ReactElement
                 SelectField : SelectFieldConfig<'Msg> -> ReactElement
+                SelectSearchField : SelectSearchFieldConfig<'Msg> -> ReactElement
                 FileField : FileFieldConfig<'Msg> -> ReactElement
                 Group : ReactElement list -> ReactElement
                 Section : string -> ReactElement list -> ReactElement

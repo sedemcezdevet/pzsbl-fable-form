@@ -10,6 +10,7 @@ module Form =
     type RadioField<'Values> = RadioField.RadioField<'Values>
     type CheckboxField<'Values> = CheckboxField.CheckboxField<'Values>
     type SelectField<'Values> = SelectField.SelectField<'Values>
+    type SelectSearchField<'Values> = SelectSearchField.SelectSearchField<'Values>
     type FileField<'Values> = FileField.FileField<'Values>
 
     type TextType =
@@ -40,6 +41,7 @@ module Form =
         | Radio of RadioField<'Values>
         | Checkbox of CheckboxField<'Values>
         | Select of SelectField<'Values>
+        | SelectSearch of SelectSearchField<'Values>
         | File of FileField<'Values>
         | Group of FilledField<'Values, 'Attributes> list
         | Section of title : string * FilledField<'Values, 'Attributes> list
@@ -152,6 +154,11 @@ module Form =
         : Form<'Values, 'Output, 'Attributes> =
         SelectField.form Field.Select config
 
+    let selectSearchField
+        (config : Base.FieldConfig<SelectSearchField.Attributes, obj, 'Values, 'Output>)
+        : Form<'Values, 'Output, 'Attributes> =
+        SelectSearchField.form Field.SelectSearch config
+
     let fileField
         (config : Base.FieldConfig<FileField.Attributes, Browser.Types.File array, 'Values, 'Output>)
         : Form<'Values, 'Output, 'Attributes> =
@@ -218,6 +225,9 @@ module Form =
 
         | Field.Select selectField ->
             Field.Select (Field.mapValues newUpdate selectField)
+
+        | Field.SelectSearch selectSearchField ->
+            Field.SelectSearch (Field.mapValues newUpdate selectSearchField)
 
         | Field.File fileField ->
             Field.File (Field.mapValues newUpdate fileField)
@@ -431,6 +441,19 @@ module Form =
             }
 
         [<NoComparison; NoEquality>]
+        type SelectSearchFieldConfig<'Msg> =
+            {
+                Dispatch : Dispatch<'Msg>
+                OnChange : obj -> 'Msg
+                OnBlur : 'Msg option
+                Disabled : bool
+                Value : obj
+                Error : Error.Error option
+                ShowError : bool
+                Attributes : SelectSearchField.Attributes
+            }
+
+        [<NoComparison; NoEquality>]
         type FileFieldConfig<'Msg> =
             {
                 Dispatch : Dispatch<'Msg>
@@ -496,6 +519,7 @@ module Form =
                 CheckboxField : CheckboxFieldConfig<'Msg> -> ReactElement
                 RadioField : RadioFieldConfig<'Msg> -> ReactElement
                 SelectField : SelectFieldConfig<'Msg> -> ReactElement
+                SelectSearchField : SelectSearchFieldConfig<'Msg> -> ReactElement
                 FileField : FileFieldConfig<'Msg> -> ReactElement
                 Group : ReactElement list -> ReactElement
                 Section : string -> ReactElement list -> ReactElement
@@ -650,6 +674,21 @@ module Form =
                     }
 
                 customConfig.SelectField config
+
+            | Field.SelectSearch info ->
+                let config : SelectSearchFieldConfig<'Msg> =
+                    {
+                        Dispatch = dispatch
+                        OnChange = info.Update >> fieldConfig.OnChange
+                        OnBlur = blur info.Attributes.Label
+                        Disabled = field.IsDisabled || fieldConfig.Disabled
+                        Value = info.Value
+                        Error = field.Error
+                        ShowError = fieldConfig.ShowError info.Attributes.Label
+                        Attributes = info.Attributes
+                    }
+
+                customConfig.SelectSearchField config
 
             | Field.File info ->
                 let config : FileFieldConfig<'Msg> =

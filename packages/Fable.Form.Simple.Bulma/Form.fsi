@@ -54,6 +54,10 @@ module Form =
             config : Form.View.SelectFieldConfig<'Msg> ->
             ReactElement
 
+        val selectSearchField :
+            config : Form.View.SelectSearchFieldConfig<'Msg> ->
+            ReactElement
+
         val fileField :
             config : Form.View.FileFieldConfig<'Msg> ->
             ReactElement

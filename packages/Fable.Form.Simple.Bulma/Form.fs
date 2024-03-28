@@ -296,6 +296,36 @@ module Form =
             ]
             |> withLabelAndError attributes.Label showError error
 
+        let selectSearchField
+            ({ Dispatch = dispatch
+               OnChange = onChange
+               OnBlur = onBlur
+               Disabled = disabled
+               Value = value
+               Error = error
+               ShowError = showError
+               Attributes = attributes }: SelectSearchFieldConfig<'Msg>)
+            =
+            SelectSearch(
+                {| value = value
+                   disabled = disabled
+                   placeholder = attributes.Placeholder
+                   onChange = (fun option -> onChange option |> dispatch)
+                   onBlur =
+                    match onBlur with
+                        | Some onBlur -> Some (fun _ -> dispatch onBlur)
+                        | None -> None
+                   loadOptions = fun value ->
+                        promise {
+                            let! options = attributes.LoadOptions value
+                            return options |> Array.ofList
+                        }
+                   getOptionValue = attributes.GetOptionValue
+                   getOptionLabel = attributes.GetOptionLabel
+                |}
+            )
+            |> withLabelAndError attributes.Label showError error
+
         let fileField
             (
                 {
@@ -598,6 +628,7 @@ module Form =
                 CheckboxField = checkboxField
                 RadioField = radioField
                 SelectField = selectField
+                SelectSearchField = selectSearchField
                 FileField = fileField
                 Group = group
                 Section = section
