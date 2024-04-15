@@ -12,6 +12,7 @@ export function SelectSearch({
 }) {
     return (
         <AsyncSelect
+            classNamePrefix="select-search"
             cacheOptions
             defaultOptions
             isDisabled={disabled}
